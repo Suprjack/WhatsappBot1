@@ -172,9 +172,34 @@ async function processUnansweredMessages(sock) {
 
         for (const message of unansweredMessages) {
             try {
-                // Vérifier si le message a déjà reçu une réponse entre-temps
+                // Vérification plus stricte pour voir si le message a déjà reçu une réponse
+                // Vérifier d'abord dans la base de données
                 if (await hasResponse(message.id)) {
+                    console.log(`Message ${message.id} déjà marqué comme répondu dans la base de données, ignoré`);
                     continue;
+                }
+
+                // Vérification supplémentaire: rechercher des messages récents de l'utilisateur qui pourraient être des réponses
+                try {
+                    const db = await getDatabase();
+                    const recentUserResponses = await db.all(
+                        `SELECT * FROM messages
+                         WHERE remoteJid = ?
+                         AND fromMe = 1
+                         AND timestamp > ?
+                         ORDER BY timestamp DESC
+                         LIMIT 5`,
+                        [message.remoteJid, message.timestamp]
+                    );
+
+                    if (recentUserResponses && recentUserResponses.length > 0) {
+                        console.log(`${recentUserResponses.length} réponses récentes de l'utilisateur trouvées, message ignoré`);
+                        // Marquer ce message comme ayant reçu une réponse pour éviter de le traiter à nouveau
+                        await saveResponse(message.id, { key: { id: 'manual-response-' + Date.now() } });
+                        continue;
+                    }
+                } catch (dbError) {
+                    console.error('Erreur lors de la vérification des réponses récentes:', dbError);
                 }
 
                 // Vérifier si c'est un message de groupe et si le bot peut y répondre
@@ -542,13 +567,37 @@ async function startWhatsAppBot() {
                     // Enregistrer le message dans la base de données
                     await saveMessage(message, messageContent);
 
-                    // Si c'est un message de l'utilisateur (fromMe), vérifier s'il répond à un message
-                    // et marquer ce message comme ayant reçu une réponse
-                    if (isFromMe && message.message.extendedTextMessage && message.message.extendedTextMessage.contextInfo) {
-                        const quotedMessageId = message.message.extendedTextMessage.contextInfo.stanzaId;
-                        if (quotedMessageId) {
-                            await saveResponse(quotedMessageId, message);
-                            console.log(`Message ${quotedMessageId} marqué comme ayant reçu une réponse de l'utilisateur`);
+                    // Si c'est un message de l'utilisateur (fromMe), marquer les messages récents comme ayant reçu une réponse
+                    if (isFromMe) {
+                        // 1. Vérifier si c'est une réponse directe à un message spécifique
+                        if (message.message.extendedTextMessage && message.message.extendedTextMessage.contextInfo) {
+                            const quotedMessageId = message.message.extendedTextMessage.contextInfo.stanzaId;
+                            if (quotedMessageId) {
+                                await saveResponse(quotedMessageId, message);
+                                console.log(`Message ${quotedMessageId} marqué comme ayant reçu une réponse directe de l'utilisateur`);
+                            }
+                        }
+
+                        // 2. Marquer également les messages récents du même contact comme ayant reçu une réponse
+                        try {
+                            const db = await getDatabase();
+                            const recentMessages = await db.all(
+                                `SELECT id FROM messages
+                                 WHERE remoteJid = ?
+                                 AND fromMe = 0
+                                 AND responded = 0
+                                 AND timestamp > ?
+                                 ORDER BY timestamp DESC
+                                 LIMIT 3`,
+                                [contactId, Date.now() - (BOT_RESPONSE_DELAY * 2)]
+                            );
+
+                            for (const recentMsg of recentMessages) {
+                                await saveResponse(recentMsg.id, message);
+                                console.log(`Message récent ${recentMsg.id} marqué comme ayant reçu une réponse indirecte de l'utilisateur`);
+                            }
+                        } catch (dbError) {
+                            console.error('Erreur lors du marquage des messages récents:', dbError);
                         }
                     }
 
