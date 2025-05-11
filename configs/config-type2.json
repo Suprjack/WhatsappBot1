@@ -1,9 +1,21 @@
 {
-  "botName": "Assistant Professionnel",
+  "botName": "WhatsApp Bot - Offre Pro",
   "responseDelay": 180000,
   "defaultLanguage": "fr",
   "defaultTone": "formel",
   "defaultRelation": "Inconnu",
+  "features": {
+    "autoResponder": true,
+    "contactProfiles": true,
+    "historyTracking": true,
+    "customPrompts": true,
+    "multiLanguage": true,
+    "businessHours": true,
+    "analytics": true,
+    "webhooks": false,
+    "mediaHandling": true,
+    "groupChat": false
+  },
   "promptTemplate": {
     "system": "Tu es l'assistant WhatsApp professionnel. Parle en français, style concis et efficace.",
     "style": {
@@ -21,5 +33,23 @@
     "history": [],
     "first_seen": 0,
     "last_seen": 0
+  },
+  "businessHours": {
+    "enabled": true,
+    "timezone": "Europe/Paris",
+    "monday": {"start": "09:00", "end": "18:00"},
+    "tuesday": {"start": "09:00", "end": "18:00"},
+    "wednesday": {"start": "09:00", "end": "18:00"},
+    "thursday": {"start": "09:00", "end": "18:00"},
+    "friday": {"start": "09:00", "end": "17:00"},
+    "saturday": null,
+    "sunday": null
+  },
+  "offerDetails": {
+    "name": "Pro",
+    "description": "Offre professionnelle avec fonctionnalités avancées pour les entreprises",
+    "maxContacts": 500,
+    "maxMessagesPerDay": 1000,
+    "supportLevel": "email+phone"
   }
 }

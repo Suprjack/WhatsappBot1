@@ -70,38 +70,67 @@ docker-compose logs -f
 
 3. Scannez le code QR qui apparaît dans les logs avec votre téléphone pour vous connecter à WhatsApp Web.
 
-### Déploiement de différentes versions du bot
+### Déploiement des différentes offres
 
-Le projet supporte plusieurs configurations pour différents types d'utilisateurs. Vous pouvez démarrer différentes instances du bot avec des configurations spécifiques :
+Le projet supporte plusieurs offres avec des fonctionnalités différentes. Vous pouvez démarrer différentes instances du bot selon l'offre souhaitée :
 
-1. Utilisez les scripts fournis pour démarrer une version spécifique :
+1. Utilisez les scripts fournis pour démarrer une offre spécifique :
 
 ```bash
-# Démarrer la version type1
-./start-bot.sh type1
+# Démarrer l'offre Basic
+./start-bot.sh basic
 
-# Démarrer la version type2
-./start-bot.sh type2
+# Démarrer l'offre Pro
+./start-bot.sh pro
 
-# Démarrer toutes les versions
+# Démarrer l'offre Premium
+./start-bot.sh premium
+
+# Démarrer toutes les offres
 ./start-bot.sh all
 ```
 
-2. Pour arrêter une version spécifique :
+2. Pour arrêter une offre spécifique :
 
 ```bash
-# Arrêter la version type1
-./stop-bot.sh type1
+# Arrêter l'offre Basic
+./stop-bot.sh basic
 
-# Arrêter toutes les versions
+# Arrêter toutes les offres
 ./stop-bot.sh all
 ```
 
-3. Consultez les logs d'une version spécifique :
+3. Consultez les logs d'une offre spécifique :
 
 ```bash
+# Logs de l'offre Basic
 docker logs -f whatsapp-bot-type1
+
+# Logs de l'offre Pro
+docker logs -f whatsapp-bot-type2
+
+# Logs de l'offre Premium
+docker logs -f whatsapp-bot-type3
 ```
+
+### Comparaison des offres
+
+| Fonctionnalité | Basic | Pro | Premium |
+|----------------|-------|-----|---------|
+| Réponse automatique | ✅ | ✅ | ✅ |
+| Profils de contacts | ✅ | ✅ | ✅ |
+| Historique des messages | ✅ | ✅ | ✅ |
+| Prompts personnalisés | ❌ | ✅ | ✅ |
+| Support multilingue | ❌ | ✅ | ✅ |
+| Horaires d'ouverture | ❌ | ✅ | ✅ |
+| Analytiques | ❌ | ✅ | ✅ |
+| Webhooks | ❌ | ❌ | ✅ |
+| Gestion des médias | ❌ | ✅ | ✅ |
+| Chat de groupe | ❌ | ❌ | ✅ |
+| Délai de réponse | 5 min | 3 min | 1 min |
+| Nombre max de contacts | 50 | 500 | Illimité |
+| Messages par jour | 100 | 1000 | Illimité |
+| Support | Email | Email+Téléphone | Premium 24/7 |
 
 ## Fonctionnement
 
@@ -129,12 +158,13 @@ Pour modifier le style des réponses, changez la valeur de `relation` :
 - Pour un ton décontracté et amical : "ami", "famille", "délire", "copine"
 - Pour un ton formel et professionnel : "Inconnu" ou toute autre valeur
 
-## Configuration des différentes versions
+## Configuration des différentes offres
 
-Vous pouvez personnaliser chaque version du bot en modifiant les fichiers de configuration dans le dossier `configs/` :
+Vous pouvez personnaliser chaque offre en modifiant les fichiers de configuration dans le dossier `configs/` :
 
-- `config-type1.json` : Configuration pour la version 1 (style personnel)
-- `config-type2.json` : Configuration pour la version 2 (style professionnel)
+- `config-type1.json` : Configuration pour l'offre Basic
+- `config-type2.json` : Configuration pour l'offre Pro
+- `config-type3.json` : Configuration pour l'offre Premium
 
 Chaque fichier de configuration contient :
 
@@ -143,10 +173,14 @@ Chaque fichier de configuration contient :
 - `defaultLanguage` : Langue par défaut
 - `defaultTone` : Ton par défaut
 - `defaultRelation` : Relation par défaut pour les nouveaux contacts
+- `features` : Fonctionnalités activées/désactivées pour cette offre
 - `promptTemplate` : Modèle de prompt pour la génération de réponses
 - `contactDefaults` : Valeurs par défaut pour les nouveaux contacts
+- `businessHours` : Configuration des horaires d'ouverture (offres Pro et Premium)
+- `webhookConfig` : Configuration des webhooks (offre Premium uniquement)
+- `offerDetails` : Détails de l'offre (nom, description, limites, support)
 
-Pour ajouter une nouvelle version, créez un nouveau fichier de configuration et un fichier docker-compose correspondant.
+Pour ajouter une nouvelle offre, créez un nouveau fichier de configuration et un fichier docker-compose correspondant.
 
 ## Licence
 

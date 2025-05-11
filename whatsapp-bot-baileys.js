@@ -16,6 +16,13 @@ import {
 } from './database.js';
 import { getContactProfile, createDefaultProfile, updateProfile } from './contact-manager.js';
 import { loadBotConfig } from './config-loader.js';
+import {
+    isFeatureEnabled,
+    isWithinBusinessHours,
+    canHandleMedia,
+    canHandleGroupChat,
+    shouldSendWebhook
+} from './feature-manager.js';
 
 dotenv.config();
 
@@ -136,12 +143,31 @@ Ta réponse (seulement la réponse, pas d'explications):`;
 // Fonction pour traiter les messages en attente
 async function processUnansweredMessages(sock) {
     try {
+        // Vérifier si la fonctionnalité de réponse automatique est activée
+        if (!isFeatureEnabled(CONFIG, 'autoResponder')) {
+            console.log('Traitement des messages en attente ignoré (fonctionnalité non activée)');
+            return;
+        }
+
+        // Vérifier si le bot est en horaires d'ouverture
+        if (isFeatureEnabled(CONFIG, 'businessHours') && !isWithinBusinessHours(CONFIG)) {
+            console.log('Traitement des messages en attente ignoré (en dehors des horaires d\'ouverture)');
+            return;
+        }
+
         // Récupérer les messages sans réponse plus anciens que le délai configuré
         const unansweredMessages = await getUnansweredMessages(BOT_RESPONSE_DELAY);
 
         for (const message of unansweredMessages) {
             // Vérifier si le message a déjà reçu une réponse entre-temps
             if (await hasResponse(message.id)) {
+                continue;
+            }
+
+            // Vérifier si c'est un message de groupe et si le bot peut y répondre
+            const isGroupMessage = message.remoteJid.endsWith('@g.us');
+            if (isGroupMessage && !canHandleGroupChat(CONFIG)) {
+                console.log('Message de groupe ignoré (fonctionnalité non activée)');
                 continue;
             }
 
@@ -160,6 +186,12 @@ async function processUnansweredMessages(sock) {
 
             // Enregistrer la réponse dans la base de données
             await saveResponse(message.id, sentMessage);
+
+            // Envoyer un webhook si la fonctionnalité est activée
+            if (shouldSendWebhook(CONFIG, 'message')) {
+                console.log('Envoi d\'un webhook pour la réponse envoyée');
+                // Implémentation de l'envoi du webhook à faire
+            }
 
             console.log(`Réponse envoyée avec succès après ${BOT_RESPONSE_DELAY/60000} minutes`);
         }
@@ -251,26 +283,50 @@ async function startWhatsAppBot() {
                     console.log(`De: ${contactId}`);
                     console.log(`Est de moi: ${isFromMe}`);
 
-                    // Si ce n'est pas un message de soi-même et que ce n'est pas un groupe,
-                    // mettre à jour le profil du contact avec le nouveau message
-                    if (!isFromMe && !contactId.endsWith('@g.us')) {
-                        // Essayer d'obtenir le nom du contact depuis le message si disponible
-                        let contactName = null;
-                        if (message.pushName) {
-                            contactName = message.pushName;
+                    // Vérifier si c'est un message de groupe
+                    const isGroupMessage = contactId.endsWith('@g.us');
+
+                    // Vérifier si le bot peut traiter les messages de groupe
+                    if (isGroupMessage && !canHandleGroupChat(CONFIG)) {
+                        console.log('Message de groupe ignoré (fonctionnalité non activée)');
+                        continue;
+                    }
+
+                    // Vérifier si le bot est en horaires d'ouverture
+                    if (!isFromMe && isFeatureEnabled(CONFIG, 'businessHours') && !isWithinBusinessHours(CONFIG)) {
+                        console.log('Message reçu en dehors des horaires d\'ouverture');
+                        // Optionnel : envoyer un message automatique indiquant les horaires d'ouverture
+                        continue;
+                    }
+
+                    // Si ce n'est pas un message de soi-même, mettre à jour le profil du contact
+                    if (!isFromMe) {
+                        // Vérifier si la fonctionnalité de profils de contacts est activée
+                        if (isFeatureEnabled(CONFIG, 'contactProfiles')) {
+                            // Essayer d'obtenir le nom du contact depuis le message si disponible
+                            let contactName = null;
+                            if (message.pushName) {
+                                contactName = message.pushName;
+                            }
+
+                            // Mettre à jour le profil avec le nouveau message
+                            const timestamp = Date.now();
+                            const updatedProfile = updateProfile(contactId, messageContent, timestamp);
+
+                            // Si c'est un nouveau contact, définir son nom
+                            if (updatedProfile && updatedProfile.name === contactId.split('@')[0] && contactName) {
+                                updatedProfile.name = contactName;
+                                saveContactProfile(contactId, updatedProfile);
+                            }
+
+                            console.log(`Profil du contact mis à jour avec le message: ${messageContent.substring(0, 30)}...`);
                         }
 
-                        // Mettre à jour le profil avec le nouveau message
-                        const timestamp = Date.now();
-                        const updatedProfile = updateProfile(contactId, messageContent, timestamp);
-
-                        // Si c'est un nouveau contact, définir son nom
-                        if (updatedProfile && updatedProfile.name === contactId.split('@')[0] && contactName) {
-                            updatedProfile.name = contactName;
-                            saveContactProfile(contactId, updatedProfile);
+                        // Envoyer un webhook si la fonctionnalité est activée
+                        if (shouldSendWebhook(CONFIG, 'message')) {
+                            console.log('Envoi d\'un webhook pour le message reçu');
+                            // Implémentation de l'envoi du webhook à faire
                         }
-
-                        console.log(`Profil du contact mis à jour avec le message: ${messageContent.substring(0, 30)}...`);
                     }
 
                     // Enregistrer le message dans la base de données

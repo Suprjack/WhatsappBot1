@@ -1,0 +1,60 @@
+{
+  "botName": "WhatsApp Bot - Offre Premium",
+  "responseDelay": 60000,
+  "defaultLanguage": "fr",
+  "defaultTone": "formel",
+  "defaultRelation": "Inconnu",
+  "features": {
+    "autoResponder": true,
+    "contactProfiles": true,
+    "historyTracking": true,
+    "customPrompts": true,
+    "multiLanguage": true,
+    "businessHours": true,
+    "analytics": true,
+    "webhooks": true,
+    "mediaHandling": true,
+    "groupChat": true
+  },
+  "promptTemplate": {
+    "system": "Tu es l'assistant WhatsApp premium. Parle dans la langue préférée du contact avec un style adapté à sa relation.",
+    "style": {
+      "friendly": "Ton chaleureux et personnalisé, émojis adaptés au contexte.",
+      "formal": "Ton professionnel et courtois, vocabulaire soigné."
+    },
+    "availability": "Je suis l'assistant virtuel et je suis à votre disposition pour vous aider.",
+    "objective": "Comment puis-je vous être utile aujourd'hui?"
+  },
+  "contactDefaults": {
+    "name": "Client Premium",
+    "relation": "Inconnu",
+    "lang": "fr",
+    "tone": "formel",
+    "history": [],
+    "first_seen": 0,
+    "last_seen": 0
+  },
+  "businessHours": {
+    "enabled": true,
+    "timezone": "Europe/Paris",
+    "monday": {"start": "08:00", "end": "20:00"},
+    "tuesday": {"start": "08:00", "end": "20:00"},
+    "wednesday": {"start": "08:00", "end": "20:00"},
+    "thursday": {"start": "08:00", "end": "20:00"},
+    "friday": {"start": "08:00", "end": "20:00"},
+    "saturday": {"start": "09:00", "end": "18:00"},
+    "sunday": {"start": "10:00", "end": "16:00"}
+  },
+  "webhookConfig": {
+    "enabled": true,
+    "url": "https://api.example.com/webhooks/whatsapp",
+    "events": ["message", "status", "contact"]
+  },
+  "offerDetails": {
+    "name": "Premium",
+    "description": "Offre haut de gamme avec toutes les fonctionnalités et support prioritaire",
+    "maxContacts": "illimité",
+    "maxMessagesPerDay": "illimité",
+    "supportLevel": "premium 24/7"
+  }
+}

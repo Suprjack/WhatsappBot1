@@ -1,9 +1,21 @@
 {
-  "botName": "Assistant Personnel",
+  "botName": "WhatsApp Bot - Offre Basic",
   "responseDelay": 300000,
   "defaultLanguage": "fr",
   "defaultTone": "décontracté",
   "defaultRelation": "ami",
+  "features": {
+    "autoResponder": true,
+    "contactProfiles": true,
+    "historyTracking": true,
+    "customPrompts": false,
+    "multiLanguage": false,
+    "businessHours": false,
+    "analytics": false,
+    "webhooks": false,
+    "mediaHandling": false,
+    "groupChat": false
+  },
   "promptTemplate": {
     "system": "Tu es l'assistant WhatsApp personnel. Parle en français, 1 phrase max 40 mots.",
     "style": {
@@ -21,5 +33,12 @@
     "history": [],
     "first_seen": 0,
     "last_seen": 0
+  },
+  "offerDetails": {
+    "name": "Basic",
+    "description": "Offre de base avec réponses automatiques et profils de contacts",
+    "maxContacts": 50,
+    "maxMessagesPerDay": 100,
+    "supportLevel": "email"
   }
 }

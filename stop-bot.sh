@@ -16,29 +16,32 @@ BOT_TYPE=$1
 stop_bot() {
     local type=$1
     echo "Arrêt du bot WhatsApp type $type..."
-    
+
     # Arrêter le conteneur Docker
     docker-compose -f docker/docker-compose-$type.yml down
-    
+
     echo "Bot WhatsApp type $type arrêté avec succès!"
 }
 
 # Arrêter le(s) bot(s) selon l'argument fourni
 case $BOT_TYPE in
-    "type1")
+    "basic")
         stop_bot "type1"
         ;;
-    "type2")
+    "pro")
         stop_bot "type2"
+        ;;
+    "premium")
+        stop_bot "type3"
         ;;
     "all")
         stop_bot "type1"
         stop_bot "type2"
-        # Ajouter d'autres types ici si nécessaire
+        stop_bot "type3"
         ;;
     *)
         echo "Type de bot non reconnu: $BOT_TYPE"
-        echo "Types disponibles: type1, type2, all"
+        echo "Types disponibles: basic, pro, premium, all"
         exit 1
         ;;
 esac
