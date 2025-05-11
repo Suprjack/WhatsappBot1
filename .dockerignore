@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+auth_baileys
+database
+.env
+.git
+.gitignore
+README.md
+.DS_Store

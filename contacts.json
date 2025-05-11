@@ -1,0 +1,22 @@
+{
+  "212605761786@s.whatsapp.net": {
+    "name": "Utilisateur Test",
+    "phone": "212605761786",
+    "relation": "ami",
+    "lang": "fr",
+    "tone": "décontracté",
+    "history": [],
+    "first_seen": 1715587387000,
+    "last_seen": 1715587387000
+  },
+  "default": {
+    "name": "Contact",
+    "phone": "000000000000",
+    "relation": "Inconnu",
+    "lang": "fr",
+    "tone": "standard",
+    "history": [],
+    "first_seen": 1715587387000,
+    "last_seen": 1715587387000
+  }
+}
