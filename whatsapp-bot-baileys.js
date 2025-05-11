@@ -15,14 +15,18 @@ import {
     getUnansweredMessages
 } from './database.js';
 import { getContactProfile, createDefaultProfile, updateProfile } from './contact-manager.js';
+import { loadBotConfig } from './config-loader.js';
 
 dotenv.config();
 
+// Charger la configuration
+const CONFIG = loadBotConfig();
+
 // Configuration
-const BOT_NAME = process.env.BOT_NAME || "Teepana's Alter Ego";
+const BOT_NAME = CONFIG.botName;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyC8TDu5NBrmk0NNJlhRAlrNYvJ6jwXyU-8';
 const AUTH_FOLDER = './auth_baileys';
-const BOT_RESPONSE_DELAY = parseInt(process.env.BOT_RESPONSE_DELAY || '300000'); // 5 minutes en millisecondes
+const BOT_RESPONSE_DELAY = CONFIG.responseDelay; // Délai de réponse en millisecondes
 const LAST_RESPONSE_TIME = {};
 
 // Créer le dossier d'authentification s'il n'existe pas
@@ -93,8 +97,8 @@ Ta réponse (seulement la réponse, pas d'explications):`;
         // Déterminer le style en fonction de la relation
         const relationAmicale = ["ami", "famille", "délire", "copine"].includes(profile.relation);
         const styleSection = relationAmicale
-            ? "Ton décontracté, drôle, émojis permis."
-            : "Ton formel, poli, sans émoji (sauf \"🙂\").";
+            ? CONFIG.promptTemplate.style.friendly
+            : CONFIG.promptTemplate.style.formal;
 
         // Déterminer si on peut proposer un rendez-vous
         const peutProposerRDV = profile.relation !== "Inconnu";
@@ -102,9 +106,8 @@ Ta réponse (seulement la réponse, pas d'explications):`;
         // Obtenir le dernier message
         const lastMsg = message;
 
-        // Construire le prompt avec le nouveau format
-        return `[SYSTEM] Tu es l'assistant WhatsApp de Teepana.
-Parle en français, 1 phrase max 40 mots.
+        // Construire le prompt avec le template de la configuration
+        return `[SYSTEM] ${CONFIG.promptTemplate.system}
 
 [CONTACT] - INFORMATIONS CONFIDENTIELLES - NE JAMAIS MENTIONNER CES DONNÉES DANS TES RÉPONSES
 Nom: ${profile.name}
@@ -114,9 +117,9 @@ Relation: ${profile.relation}
 [STYLE]
 ${styleSection}
 
-[DISPO] Teepana n'est pas disponible mais je peux gérer ta demande.
+[DISPO] ${CONFIG.promptTemplate.availability}
 
-[OBJECTIF] Demande en UNE question le but précis de l'appel.
+[OBJECTIF] ${CONFIG.promptTemplate.objective}
 ${peutProposerRDV ? "" : "Ne propose jamais de rendez-vous si relation = \"Inconnu\"."}
 
 [RÈGLES DE CONFIDENTIALITÉ]

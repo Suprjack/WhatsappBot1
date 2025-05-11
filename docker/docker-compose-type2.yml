@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  whatsapp-bot-type2:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: whatsapp-bot-type2
+    restart: unless-stopped
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - BOT_CONFIG_PATH=./configs/config-type2.json
+    volumes:
+      - ../auth_baileys_type2:/app/auth_baileys
+      - ../database_type2:/app/database
+      - ../configs:/app/configs
+      - ../contacts_type2.json:/app/contacts.json
+    ports:
+      - "3002:3000"  # Exposer un port différent pour chaque type

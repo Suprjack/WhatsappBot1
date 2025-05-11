@@ -54,6 +54,8 @@ npm start
 
 ## Déploiement avec Docker
 
+### Déploiement standard
+
 1. Construisez et démarrez les conteneurs :
 
 ```bash
@@ -68,6 +70,39 @@ docker-compose logs -f
 
 3. Scannez le code QR qui apparaît dans les logs avec votre téléphone pour vous connecter à WhatsApp Web.
 
+### Déploiement de différentes versions du bot
+
+Le projet supporte plusieurs configurations pour différents types d'utilisateurs. Vous pouvez démarrer différentes instances du bot avec des configurations spécifiques :
+
+1. Utilisez les scripts fournis pour démarrer une version spécifique :
+
+```bash
+# Démarrer la version type1
+./start-bot.sh type1
+
+# Démarrer la version type2
+./start-bot.sh type2
+
+# Démarrer toutes les versions
+./start-bot.sh all
+```
+
+2. Pour arrêter une version spécifique :
+
+```bash
+# Arrêter la version type1
+./stop-bot.sh type1
+
+# Arrêter toutes les versions
+./stop-bot.sh all
+```
+
+3. Consultez les logs d'une version spécifique :
+
+```bash
+docker logs -f whatsapp-bot-type1
+```
+
 ## Fonctionnement
 
 - Le bot enregistre tous les messages reçus dans une base de données SQLite.
@@ -79,7 +114,7 @@ docker-compose logs -f
 
 ## Gestion des profils de contacts
 
-Les profils de contacts sont stockés dans le fichier `contacts.json`. Chaque profil contient :
+Les profils de contacts sont stockés dans le fichier `contacts.json` (ou `contacts_typeX.json` pour les différentes versions). Chaque profil contient :
 
 - `name` : Nom du contact
 - `phone` : Numéro de téléphone (confidentiel, usage interne uniquement)
@@ -93,6 +128,25 @@ Les profils de contacts sont stockés dans le fichier `contacts.json`. Chaque pr
 Pour modifier le style des réponses, changez la valeur de `relation` :
 - Pour un ton décontracté et amical : "ami", "famille", "délire", "copine"
 - Pour un ton formel et professionnel : "Inconnu" ou toute autre valeur
+
+## Configuration des différentes versions
+
+Vous pouvez personnaliser chaque version du bot en modifiant les fichiers de configuration dans le dossier `configs/` :
+
+- `config-type1.json` : Configuration pour la version 1 (style personnel)
+- `config-type2.json` : Configuration pour la version 2 (style professionnel)
+
+Chaque fichier de configuration contient :
+
+- `botName` : Nom du bot
+- `responseDelay` : Délai de réponse en millisecondes
+- `defaultLanguage` : Langue par défaut
+- `defaultTone` : Ton par défaut
+- `defaultRelation` : Relation par défaut pour les nouveaux contacts
+- `promptTemplate` : Modèle de prompt pour la génération de réponses
+- `contactDefaults` : Valeurs par défaut pour les nouveaux contacts
+
+Pour ajouter une nouvelle version, créez un nouveau fichier de configuration et un fichier docker-compose correspondant.
 
 ## Licence
 

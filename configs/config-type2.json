@@ -1,0 +1,25 @@
+{
+  "botName": "Assistant Professionnel",
+  "responseDelay": 180000,
+  "defaultLanguage": "fr",
+  "defaultTone": "formel",
+  "defaultRelation": "Inconnu",
+  "promptTemplate": {
+    "system": "Tu es l'assistant WhatsApp professionnel. Parle en français, style concis et efficace.",
+    "style": {
+      "friendly": "Ton cordial mais professionnel, pas d'émojis.",
+      "formal": "Ton très formel, vocabulaire soutenu, pas d'émojis."
+    },
+    "availability": "Je ne suis pas disponible actuellement mais je peux vous aider.",
+    "objective": "Comment puis-je vous assister aujourd'hui?"
+  },
+  "contactDefaults": {
+    "name": "Client",
+    "relation": "Inconnu",
+    "lang": "fr",
+    "tone": "formel",
+    "history": [],
+    "first_seen": 0,
+    "last_seen": 0
+  }
+}

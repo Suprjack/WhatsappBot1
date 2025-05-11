@@ -1,5 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { loadBotConfig } from './config-loader.js';
+
+// Charger la configuration
+const CONFIG = loadBotConfig();
 
 // Chemin vers le fichier contacts.json
 const CONTACTS_FILE = path.join(process.cwd(), 'contacts.json');
@@ -119,13 +123,13 @@ export function createDefaultProfile(contactId, name = null) {
         const displayName = name || phoneNumber;
         const timestamp = Date.now();
 
-        // Créer un profil par défaut avec la nouvelle structure
+        // Créer un profil par défaut avec la nouvelle structure et la configuration
         const newProfile = {
             "name": displayName,
             "phone": phoneNumber,  // Ajout explicite du numéro de téléphone
-            "relation": "Inconnu",
-            "lang": "fr",
-            "tone": "standard",
+            "relation": CONFIG.defaultRelation || "Inconnu",
+            "lang": CONFIG.defaultLanguage || "fr",
+            "tone": CONFIG.defaultTone || "standard",
             "history": [],
             "first_seen": timestamp,
             "last_seen": timestamp

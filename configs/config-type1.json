@@ -1,0 +1,25 @@
+{
+  "botName": "Assistant Personnel",
+  "responseDelay": 300000,
+  "defaultLanguage": "fr",
+  "defaultTone": "décontracté",
+  "defaultRelation": "ami",
+  "promptTemplate": {
+    "system": "Tu es l'assistant WhatsApp personnel. Parle en français, 1 phrase max 40 mots.",
+    "style": {
+      "friendly": "Ton décontracté, drôle, émojis permis.",
+      "formal": "Ton formel, poli, sans émoji (sauf \"🙂\")."
+    },
+    "availability": "Je ne suis pas disponible mais je peux gérer ta demande.",
+    "objective": "Demande en UNE question le but précis de l'appel."
+  },
+  "contactDefaults": {
+    "name": "Contact",
+    "relation": "Inconnu",
+    "lang": "fr",
+    "tone": "standard",
+    "history": [],
+    "first_seen": 0,
+    "last_seen": 0
+  }
+}
